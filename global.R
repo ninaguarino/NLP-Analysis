@@ -5,10 +5,6 @@ library(plotly)
 library(tidyr)
 library("reprex")
 library(tidyverse)
-#install.packages('rsconnect')
-#rsconnect::setAccountInfo(name='ninaguarino', token='BF96CE5E667AF99349E4DCCB6E322028', secret='H56gFvJg6+TYjbnN5O+VHlJcUz+plqHzv4ffAydc')
-#library(rsconnect)
-#rsconnect::deployApp('~/Documents/AmenityAnalytics/NLP_Project')
 
 #setwd("~/Documents/AmenityAnalytics/NLP_Project")
 
