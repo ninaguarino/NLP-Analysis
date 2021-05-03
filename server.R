@@ -1,5 +1,5 @@
 # Output functions
-
+library(shiny)
 server <- function(input, output) {
   # Datatable for dataset menu item
   output$amenityData <- DT::renderDataTable({
@@ -31,7 +31,8 @@ server <- function(input, output) {
     fig <-
       fig %>% add_trace(y = ~ uniqueReviewData$managementScore,
                         name = "Management")
-    fig <- fig %>% layout(title = "Breakdown of Company Scores")
+    fig <- fig %>% layout(title = "Breakdown of Company Scores",
+                          yaxis = list(title = 'Average Score'))
     fig
   })
   
@@ -42,8 +43,7 @@ server <- function(input, output) {
         uniqueReviewData,
         labels = ~ uniqueReviewData$recommends,
         type = 'pie',
-        #mode = 'markers',
-        marker = list(colors = c("0F9D58", "DB4437"))
+        marker = list(colors = c( "#0080ff", "#1b4388"))
       )
     fig <- fig %>% layout(title = 'Recommends Company')
     fig
@@ -56,8 +56,7 @@ server <- function(input, output) {
         uniqueReviewData,
         labels = ~ uniqueReviewData$ceo_opinion,
         type = 'pie',
-        #mode = 'markers',
-        marker = list(colors = c("DB4437", "0F9D58", "F4B400"))
+        marker = list(colors = c( "#1b4388", "#0080ff"))
       )
     fig <- fig %>% layout(title = 'Recommends CEO')
     fig
@@ -70,8 +69,7 @@ server <- function(input, output) {
         amenityData,
         labels = ~ amenityData$Polarity,
         type = 'pie',
-        #mode = 'markers',
-        marker = list(colors = c("0F9D58"))
+        marker = list(colors = c( "#0080ff", "#1b4388"))
       )
     fig <- fig %>% layout(title = 'Polarity of Reviews')
     fig
@@ -83,12 +81,13 @@ server <- function(input, output) {
       negExtractions,
       x = ~ Extraction,
       y = ~ n,
-      type = 'bar'
+      type = 'bar',
+      color = I("#0080ff")
     )
     fig <-
       fig %>% layout(
-        title = "Negative Extractions",
-        xaxis = list(title = 'Extraction'),
+        title = "Negative Text Extractions",
+        xaxis = list(title = 'Text Extraction'),
         yaxis = list(title = 'Review Count')
       )
     fig
@@ -100,12 +99,13 @@ server <- function(input, output) {
       posExtractions,
       x = ~ Extraction,
       y = ~ n,
-      type = 'bar'
+      type = 'bar',
+      color = I("#0080ff")
     )
     fig <-
       fig %>% layout(
-        title = "Positive Extractions",
-        xaxis = list(title = 'Extraction'),
+        title = "Positive Text Extractions",
+        xaxis = list(title = 'Text Extraction'),
         yaxis = list(title = 'Review Count')
       )
     fig
@@ -114,7 +114,7 @@ server <- function(input, output) {
   # Positive Output Table
   output$posExtractionSentences <- DT::renderDataTable({
     DT::datatable(
-      amenityData %>% filter(Polarity == "POS" &
+      amenityData %>% filter(Polarity == "Positive" &
                                Extraction == input$Extraction1) %>% select(`Article Date`, Sentence) %>% arrange(desc(`Article Date`)),
       rownames = FALSE,
       options = list(
@@ -128,7 +128,7 @@ server <- function(input, output) {
   # Negative Output Table
   output$negExtractionSentences <- DT::renderDataTable({
     DT::datatable(
-      amenityData %>% filter(Polarity == "NEG" &
+      amenityData %>% filter(Polarity == "Negative" &
                                Extraction == input$Extraction2) %>% select(`Article Date`, Sentence) %>% arrange(desc(`Article Date`)),
       rownames = FALSE,
       options = list(
@@ -180,11 +180,10 @@ server <- function(input, output) {
         y =  ~ recommends,
         name = "Recommends",
         type = "scatter",
-        mode = "lines"
-      )
+        mode = "lines") 
     fig <-
       fig %>% add_trace(y = ~ ceo_opinion,
-                        name = 'ceo_opinion',
+                        name = 'CEO Approval',
                         mode = "lines")
     fig <- fig %>% layout(
       title = "Time Series of Average Company Recommendations and CEO Approval",
@@ -196,14 +195,17 @@ server <- function(input, output) {
   
   # Top Neg ESG Bar Plot
   output$negESG <- renderPlotly({
-    fig <- plot_ly(negESG,
-                   x = ~ ESG,
-                   y = ~ n,
-                   type = 'bar')
+    fig <- plot_ly(
+      negESG,
+      x = ~ ESG,
+      y = ~ n,
+      type = 'bar',
+      color = I("#0080ff")
+    )
     fig <-
       fig %>% layout(
-        title = "Negative ESG",
-        xaxis = list(title = 'ESG'),
+        title = "Negative ESG Keywords",
+        xaxis = list(title = 'ESG Keywords'),
         yaxis = list(title = 'Review Count')
       )
     fig
@@ -211,14 +213,17 @@ server <- function(input, output) {
   
   # Top Pos ESG Bar Plot
   output$posESG <- renderPlotly({
-    fig <- plot_ly(posESG,
-                   x = ~ ESG,
-                   y = ~ n,
-                   type = 'bar')
+    fig <- plot_ly(
+      posESG,
+      x = ~ ESG,
+      y = ~ n,
+      type = 'bar',
+      color = I("#0080ff")
+    )
     fig <-
       fig %>% layout(
-        title = "Positive ESG",
-        xaxis = list(title = 'ESG'),
+        title = "Positive ESG Keywords",
+        xaxis = list(title = 'ESG Keywords'),
         yaxis = list(title = 'Review Count')
       )
     fig
@@ -250,7 +255,7 @@ server <- function(input, output) {
     
     fig <- fig %>% layout(
       title = "ESG Against Average Company Scores",
-      xaxis = list(title = 'ESG Criteria'),
+      xaxis = list(title = 'ESG Keywords'),
       yaxis = list(title = 'Average Score')
     )
     fig
@@ -274,7 +279,7 @@ server <- function(input, output) {
     
     fig <- fig %>% layout(
       title = "ESG against Company Recommendation and CEO Approval",
-      xaxis = list(title = 'ESC Criteria'),
+      xaxis = list(title = 'ESC Keywords'),
       yaxis = list(title = 'Average Score')
     )
     fig
